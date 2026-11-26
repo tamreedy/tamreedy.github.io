@@ -17730,6 +17730,7 @@ function vx({ s: e, nurse: t }) {
     [b, z] = m.useState(""),
     [d, x] = m.useState(!1),
     [k, C] = m.useState(null),
+    [cw, setCw] = m.useState(!1),
     j = gx(),
     v = t.services.filter((M) => s.includes(M.id)),
     P = (M) =>
@@ -17742,18 +17743,15 @@ function vx({ s: e, nurse: t }) {
       ),
     T = h ? 100 : 0,
     L = v.reduce((M, Y) => M + yr(Y), 0) + T,
-    K = async () => {
+    K = async (okU) => {
       if (g.trim().length < 8) {
         e.toast("اكتب العنوان بالتفصيل عشان الممرض يعرف يوصلك");
         return;
       }
-      if (
-        !t.verified &&
-        !window.confirm(
-          "هذا الممرض لم يتم توثيقه بعد.\nالتطبيق لم يراجع بطاقته وكارنيه النقابة. هل تريد المتابعة في الحجز على مسؤوليتك؟",
-        )
-      )
+      if (!t.verified && okU !== true) {
+        setCw(!0);
         return;
+      }
       x(!0);
       try {
         const M = await of({
@@ -17881,6 +17879,41 @@ function vx({ s: e, nurse: t }) {
             onBack: e.back,
             onHome: () => e.go("home"),
           }),
+          !t.verified &&
+            n.jsx(Q, {
+              title: "غير موثق",
+              tone: "warning",
+              children:
+                "هذا الممرض لم يتم توثيقه بعد. التطبيق لم يراجع بطاقته وكارنيه النقابة.",
+            }),
+          cw &&
+            n.jsx("div", {
+              className: "tm-updmodal-veil",
+              children: n.jsxs("div", {
+                className: "tm-updmodal",
+                role: "dialog",
+                children: [
+                  n.jsx("h3", { children: "هذا الممرض لم يتم توثيقه بعد" }),
+                  n.jsx("p", {
+                    className: "tm-note",
+                    children:
+                      "لم نراجع بطاقته وكارنيه النقابة حتى الآن. الحجز معه يكون على مسؤوليتك. هل تريد المتابعة؟",
+                  }),
+                  n.jsx("button", {
+                    className: "tm-big-btn blue",
+                    onClick: () => {
+                      (setCw(!1), K(!0));
+                    },
+                    children: "أفهم، تابع الحجز",
+                  }),
+                  n.jsx("button", {
+                    className: "tm-link",
+                    onClick: () => setCw(!1),
+                    children: "إلغاء",
+                  }),
+                ],
+              }),
+            }),
           n.jsxs("div", {
             className: "tm-book-head",
             children: [
