@@ -2,7 +2,7 @@
 // Caches the app shell so the app opens fast and works with a weak connection.
 // API calls (tamreedy-server.onrender.com) are NEVER cached: they always go to
 // the network so data is always live.
-const CACHE = 'tamreedy-shell-v1';
+const CACHE = 'tamreedy-shell-v2';
 const SHELL = ['./index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', (e) => {
@@ -20,6 +20,8 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
     const url = new URL(e.request.url);
     if (e.request.method !== 'GET' || url.origin !== self.location.origin) return; // API & non-GET: network only
+    // version.json and the app shell must never come from the cache (the update check depends on them)
+    if (url.pathname.endsWith('/version.json')) return;
     if (e.request.mode === 'navigate') {
         // App shell: network first, fall back to cache when offline.
         e.respondWith(fetch(e.request).then((res) => {
