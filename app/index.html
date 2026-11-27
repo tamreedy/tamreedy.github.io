@@ -9547,7 +9547,7 @@ const ap = (e) => S("/api/appeal", { body: { text: e } }),
       body: { days: t },
     }),
   hp = () => S("/api/owner/user-counts"),
-  ot = { nameAr: "١٫٩٫١", code: 24 },
+  ot = { nameAr: "١٫٩٫٢", code: 25 },
   vo = "https://tamreedy.github.io/",
   Gi =
     "آخر تحديث: ٩ ديسمبر ٢٠٢٦. النصوص دي اتكتبت وراجعناها بنفسنا على قانون حماية البيانات الشخصية المصري رقم ١٥١ لسنة ٢٠٢٠ ولائحته التنفيذية، ومتراجعتش من محامي. وبتتراجع بشكل دوري.";
@@ -11206,7 +11206,7 @@ function ed(e, t, s) {
                     "c",
                   )
                 : u.t === "notifs"
-                  ? n.jsx(Zp, { s: e, onClose: c }, "nf")
+                  ? n.jsx(Zp, { s: e, onClose: c, push: a }, "nf")
                   : u.t === "dms"
                     ? n.jsx(Yp, { s: e, onClose: c, push: a }, "dms")
                     : u.t === "dm"
@@ -12945,7 +12945,7 @@ function Vp({ s: e, id: t, onClose: s, push: r, needRules: A }) {
     ],
   });
 }
-function Zp({ s: e, onClose: t }) {
+function Zp({ s: e, onClose: t, push: pp }) {
   const [s, r] = m.useState(null),
     A = () =>
       Fi()
@@ -13023,9 +13023,19 @@ function Zp({ s: e, onClose: t }) {
         n.jsxs(
           "div",
           {
-            className: i.unread
-              ? "tm-card tm-notif unread"
-              : "tm-card tm-notif",
+            className:
+              (i.unread ? "tm-card tm-notif unread" : "tm-card tm-notif") +
+              (i.link ? " tm-notif-link" : ""),
+            role: i.link ? "button" : void 0,
+            style: i.link ? { cursor: "pointer" } : void 0,
+            onClick: i.link
+              ? () => {
+                  const L = String(i.link);
+                  if (L.startsWith("post:") && pp) pp({ t: "post", id: L.slice(5) });
+                  else if (L === "bookings") (t(), e.go("mine"));
+                  else if (L === "me") (t(), e.go("me"));
+                }
+              : void 0,
             children: [
               n.jsxs("span", {
                 children: [
