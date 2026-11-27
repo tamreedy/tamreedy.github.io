@@ -2,7 +2,7 @@
 // Caches the app shell so the app opens fast and works with a weak connection.
 // API calls (tamreedy-server.onrender.com) are NEVER cached: they always go to
 // the network so data is always live.
-const CACHE = 'tamreedy-shell-v4';
+const CACHE = 'tamreedy-shell-v5';
 const SHELL = ['./index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', (e) => {

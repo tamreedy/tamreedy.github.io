@@ -9378,6 +9378,7 @@ const uf = (e, t, s) =>
       body: { reason: t },
     }),
   hf = () => S("/api/owner/nurses/all"),
+  hfq = (q) => S("/api/owner/nurses/all?q=" + encodeURIComponent(q)),
   ff = (e, t) =>
     S(`/api/owner/nurses/${encodeURIComponent(e)}/feature`, {
       body: { featured: t },
@@ -9547,7 +9548,7 @@ const ap = (e) => S("/api/appeal", { body: { text: e } }),
       body: { days: t },
     }),
   hp = () => S("/api/owner/user-counts"),
-  ot = { nameAr: "١٫٩٫٢", code: 25 },
+  ot = { nameAr: "١٫٩٫٣", code: 26 },
   vo = "https://tamreedy.github.io/",
   Gi =
     "آخر تحديث: ٩ ديسمبر ٢٠٢٦. النصوص دي اتكتبت وراجعناها بنفسنا على قانون حماية البيانات الشخصية المصري رقم ١٥١ لسنة ٢٠٢٠ ولائحته التنفيذية، ومتراجعتش من محامي. وبتتراجع بشكل دوري.";
@@ -19231,7 +19232,9 @@ function Mx({ s: e }) {
     [a, c] = m.useState(""),
     [o, h] = m.useState({}),
     [p, u] = m.useState(null),
-    [f, g] = m.useState([]),
+    [f0, g] = m.useState([]),
+    [sq, setSq] = m.useState(""),
+    [sr, setSr] = m.useState(null),
     y = m.useCallback(() => {
       hf()
         .then(g)
@@ -19240,6 +19243,20 @@ function Mx({ s: e }) {
   m.useEffect(() => {
     y();
   }, [y]);
+  m.useEffect(() => {
+    const q = sq.trim();
+    if (q.length < 2) {
+      setSr(null);
+      return;
+    }
+    const tm = setTimeout(() => {
+      hfq(q)
+        .then(setSr)
+        .catch(() => setSr([]));
+    }, 350);
+    return () => clearTimeout(tm);
+  }, [sq]);
+  const f = sr !== null && sq.trim().length >= 2 ? sr : f0;
   const [b, z] = m.useState(null);
   m.useEffect(() => {
     hp()
@@ -19700,10 +19717,28 @@ function Mx({ s: e }) {
         children:
           "علامة «مميز» بتدي الممرض أولوية في أول الاقتراحات، وبتوضح للمريض إن الظهور ده مدفوع. شرطها: ترخيص سليم + تقييم ٤ نجوم أو أكتر من ٣ تقييمات على الأقل. (التحصيل الإلكتروني لسه مش متاح — العلامة بتتدار يدويًا لحد ما بوابة الدفع تتوفر.)",
       }),
+      n.jsx("input", {
+        className: "tm-input",
+        id: "tm-owner-nurse-search",
+        type: "search",
+        placeholder: "ابحث عن أي ممرض: الاسم أو المنطقة أو الخدمة أو الموبايل",
+        value: sq,
+        onChange: (ev) => setSq(ev.target.value),
+        style: { marginBottom: 10 },
+      }),
+      sr !== null &&
+        sq.trim().length >= 2 &&
+        n.jsx("p", {
+          className: "tm-card-sub",
+          children: `نتيجة البحث: ${sr.length} (بيشمل الممرضين المخفيين والمرفوضين)`,
+        }),
       f.length === 0 &&
         n.jsx("p", {
           className: "tm-card-sub",
-          children: "مفيش ممرضين موثّقين ظاهرين دلوقتي.",
+          children:
+            sr !== null && sq.trim().length >= 2
+              ? "مفيش ممرض بالاسم ده."
+              : "مفيش ممرضين موثّقين ظاهرين دلوقتي.",
         }),
       f.map((j) =>
         n.jsxs(
@@ -19727,11 +19762,17 @@ function Mx({ s: e }) {
                       className: "tm-sponsored",
                       children: "مميز",
                     }),
+                  j.hidden &&
+                    n.jsx("span", {
+                      className: "tm-card-sub",
+                      children: " · مخفي عن المرضى (" + (j.status === "rejected" ? "مرفوض" : "الكارنيه منتهي أو غير مكتمل") + ")",
+                    }),
                 ],
               }),
               n.jsxs("div", {
                 className: "tm-card-sub",
                 children: [
+                  j.phone ? j.phone + " · " : "",
                   j.area,
                   "، ",
                   j.gov,
